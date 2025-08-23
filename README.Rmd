@@ -1,0 +1,122 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  echo = FALSE,
+  comment = ""
+)
+```
+
+# Connecting-RStudio-and-Git-Github
+
+1. Clone this repository to your local machine
+2. Open RStudio using the project file `Connecting-RStudio-and-Git-Github.Rproj`
+3. Open the file `README.Rmd`
+4. Make sure that the following code chunks run successfully
+    
+  - Load Packages ...
+  
+```{r}
+library(usethis)
+library(git2r)
+library(rstudioapi)
+```
+
+  - Versions
+  
+```{r versions}
+  res <- list()
+  res$R <- R.version.string
+  res$git <- tryCatch(system("git --version", intern = TRUE), error = function(e) "Git not found")
+  res$rstudio <- rstudioapi::versionInfo()$version
+
+  if (file.exists("versions.rds")) {
+      cat(paste("Installations found:\n"))
+      cat(paste("  <", res$R, ">\n"))
+      cat(paste("  RStudio version: <", res$rstudio, ">\n"))
+      cat(paste("  <", res$git, ">\n"))
+  } else {
+    cat("Run the code chunk 'versions' at least once successfully.")
+  }
+  saveRDS(res, "versions.rds")
+  tryCatch(system("git add versions.rds"))
+```
+
+  - Connection to git
+```{r gitconnection}
+  if (!file.exists("gitconnection.rds")) {
+    cat("Run the code chunk 'gitconnection' at least once successfully.")
+    noerror <- TRUE
+  }
+
+  project_path <- tryCatch(usethis::proj_get(), error = function(e) NULL)
+
+  if (is.null(project_path)) {
+    cat("No active R project found.\n")
+    noerror <- FALSE
+    return(invisible(NULL))
+  }
+
+  cat("Project Path: ", project_path, "\n")
+  repo <- tryCatch(git2r::repository(project_path, discover = TRUE), error = function(e) NULL)
+
+  if (is.null(repo)) {
+    cat("This is not a Git repository.\n")
+    noerror <- FALSE
+    return(invisible(NULL))
+  }
+
+  cat("Git repository detected.\n")
+  github_remote  <- git2r::remotes(repo)
+
+  if (length(github_remote) == 0) {
+    cat("No GitHub remote configured.\n")
+    noerror <- FALSE
+    return(invisible(NULL))
+  }
+
+  cat("GitHub Remote(s):\n")
+  print(github_remote)
+
+  remote_name <- names(github_remote)[1]
+  remote_url <- github_remote[[1]]
+
+  cat("\nChecking pull access...\n")
+  pull_check <- tryCatch({
+    system(paste("git ls-remote", remote_url), intern = TRUE)
+    TRUE
+  }, error = function(e) FALSE)
+  cat("Pull rights:", ifelse(pull_check, "YES", "NO"), "\n")
+  noerror <- noerror & pull_check
+
+  cat("\nChecking push access...\n")
+  push_check <- tryCatch({
+    system("git push --dry-run", intern = TRUE)
+    TRUE
+  }, error = function(e) FALSE)
+  cat("Push rights:", ifelse(push_check, "YES", "NO"), "\n")
+  noerror <- noerror & push_check
+  
+  if (noerror) saveRDS(push_check, "gitconnection.rds")
+```
+5. Create the `README.md` file by rendering the `README.Rmd` file
+
+6. Check the resulting `README.md` file: 
+
+    - is your version of R  (relatively) current?  (most current: 4.5.1)
+    - is your RStudio version from this year?
+    - is your version of git (relatively) current? (most current: 2.51.0)
+
+    If any of your answers above is 'no' install a newer version.
+
+    - Do you have push and pull access to the Git repository?
+  
+    If not, make sure that you have followed all of the steps laid out in [chapter 12 of Jenny Bryan's "Happy Git and GitHub for the useR"](https://happygitwithr.com/rstudio-git-github)
+
+7. Commit and push all changed files to Github classroom.
+8. Your done!
