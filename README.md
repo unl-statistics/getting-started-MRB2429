@@ -15,16 +15,18 @@
 
 <!-- -->
 
-    Run the code chunk 'versions' at least once successfully.
+    Installations found:
+      < R version 4.5.2 (2025-10-31) >
+      RStudio version: < 2026.1.0.392 >
+      < git version 2.50.1 (Apple Git-155) >
 
 - Connection to git
 
 <!-- -->
 
     Run the code chunk 'gitconnection' at least once successfully.
-    ✔ Setting active project to
-      "/Users/hofmann/Documents/Teaching/stat-assignments/Connecting-RStudio-and-Git-Github".
-    Project Path:  /Users/hofmann/Documents/Teaching/stat-assignments/Connecting-RStudio-and-Git-Github 
+    ✔ Setting active project to "/Users/maxbuettenback/Desktop/HW0".
+    Project Path:  /Users/maxbuettenback/Desktop/HW0 
     Git repository detected.
     GitHub Remote(s):
     [1] "origin"
